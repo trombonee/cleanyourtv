@@ -44,5 +44,6 @@
   "restore_key_services": true,
   "advanced_effects": false,
   "clock_wallpaper": true,
-  "clock_wallpaper_dim": 40
+  "clock_wallpaper_dim": 40,
+  "launcher_settings_button": true
 }
