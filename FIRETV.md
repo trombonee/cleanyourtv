@@ -39,6 +39,16 @@ and use `127.0.0.1:15555` (see `tools/native-adb.md`). Always reinstall through 
   wallpapers drawn by `make_wallpapers.py` (moss is the default; pick others from Launcher settings > Wallpaper).
 - `themes/my-firestick`: a plainer dock and grid.
 
+## Screensaver without ads
+
+Amazon's screensaver (`com.amazon.ftv.screensaver`) shows sponsored content. The launcher's own `ClockDream` replaces
+it; with `clock_wallpaper` (on in `themes/cleanframe-look`) the clock drifts over the theme's wallpaper:
+
+```sh
+adb shell settings put secure screensaver_components com.gathin.tvhome/.ClockDream
+# undo: adb shell settings put secure screensaver_components com.amazon.ftv.screensaver/.app.services.ScreensaverService
+```
+
 ## Speed notes (Fire TV Stick 3rd gen)
 
 Home from an app back to the launcher, median: 2.46 s stock; 2.34 s after the

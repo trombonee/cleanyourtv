@@ -42,5 +42,7 @@
   "clock_format": "12",
   "wallpaper_true_color": true,
   "restore_key_services": true,
-  "advanced_effects": false
+  "advanced_effects": false,
+  "clock_wallpaper": true,
+  "clock_wallpaper_dim": 40
 }
