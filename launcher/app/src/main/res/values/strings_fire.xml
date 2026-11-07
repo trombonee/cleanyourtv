@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fire OS Home takeover (FireHome). English only in this fork. -->
+<resources>
+    <string name="amazon_home" translatable="false">Amazon home screen</string>
+    <string name="amazon_home_help" translatable="false">Opens Fire TV\'s original home screen and leaves it alone until you press Home or open another app. Press Home to come back here.</string>
+</resources>

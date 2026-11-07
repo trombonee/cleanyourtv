@@ -1,0 +1,36 @@
+{
+  "dock_apps": [
+    "com.netflix.ninja",
+    "com.amazon.firetv.youtube",
+    "ca.bellmedia.cravetv",
+    "com.disney.disneyplus",
+    "com.apple.atve.amazon.appletv",
+    "ca.cbc.android.cbctv"
+  ],
+  "hidden_apps": [
+    "com.amazon.shoptv.firetv.client",
+    "com.amazon.spiderpork",
+    "com.amazon.audiohome",
+    "com.amazon.bueller.music",
+    "com.amazon.firetv.troubleshooting"
+  ],
+  "columns": 6,
+  "rows_below_dock": 1,
+  "background_color": "#05070C",
+  "wallpaper": true,
+  "wallpaper_dim": 15,
+  "show_greeting": false,
+  "dock_title": false,
+  "dock_glass": true,
+  "dock_opacity": 50,
+  "dock_even_padding": true,
+  "glass_style": "rim",
+  "icon_only_buttons": true,
+  "show_inputs_pill": false,
+  "ambient_glow": false,
+  "app_glow": false,
+  "focus_overshoot": false,
+  "clock_format": "12",
+  "stock_home_redirect": "com.amazon.tv.launcher",
+  "restore_key_services": true
+}

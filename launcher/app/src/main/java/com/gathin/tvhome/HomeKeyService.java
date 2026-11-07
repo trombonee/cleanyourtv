@@ -92,6 +92,8 @@ public class HomeKeyService extends AccessibilityService {
     private boolean steppingOut;
     /** The bound helper, so the opt-in broadcast can arm it without waiting for a new connection. */
     private static HomeKeyService running;
+    /** Fire OS Home takeover: stock_home_redirect is Amazon's launcher, which can't be disabled. */
+    private FireHome fireHome;
 
     @Override
     protected void onServiceConnected() {
@@ -138,6 +140,10 @@ public class HomeKeyService extends AccessibilityService {
     @Override
     public void onDestroy() {
         if (running == this) running = null;
+        if (fireHome != null) {
+            fireHome.destroy();
+            fireHome = null;
+        }
         RemoteKeys.release(this);
         stopWaitingForUnlock();
         if (screenOnReceiver != null) unregisterReceiver(screenOnReceiver);
@@ -207,6 +213,12 @@ public class HomeKeyService extends AccessibilityService {
                 stockHome.add(ri.activityInfo.name);
             }
         }
+        if (FireHome.AMAZON.equals(stockHomePackage) && !stockHome.isEmpty()) {
+            if (fireHome == null) fireHome = new FireHome(this);
+        } else if (fireHome != null) {
+            fireHome.destroy();
+            fireHome = null;
+        }
         // power_on_home, off by default. Not with boot_to_live_tv, or with Live TV picked as the Open on start app:
         // those open Live TV on purpose at boot.
         String openOnStart = config.openOnStartChoice
@@ -259,6 +271,7 @@ public class HomeKeyService extends AccessibilityService {
                 && event.getKeyCode() != KeyEvent.KEYCODE_POWER && event.getKeyCode() != KeyEvent.KEYCODE_WAKEUP) {
             powerOnUntil = 0;
         }
+        if (fireHome != null && fireHome.swallow(event)) return true;
         if (consumeVolumeKeys && VolumeKeys.handle(this, event)) return true;
         // A scancode entry is more specific than any keycode, so it goes first.
         if (RemoteKeys.handle(this, event, inFront(appScancodes, frontAppScancodes, event.getScanCode()),
@@ -317,6 +330,10 @@ public class HomeKeyService extends AccessibilityService {
         // power_on_home: the firmware opened Live TV by itself at power-on, before anyone pressed a key.
         if (powerOnRedirect(powerOnLiveTv, event.getPackageName(), SystemClock.elapsedRealtime(), powerOnUntil)) {
             openHome();
+            return;
+        }
+        if (fireHome != null) {
+            fireHome.onWindow(event);
             return;
         }
         // stock_home_redirect: the firmware turned the stock launcher back on and its home screen came up.

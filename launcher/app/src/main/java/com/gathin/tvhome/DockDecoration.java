@@ -88,12 +88,15 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         if (!bandVisible) return;
+        // A single row wider than the screen scrolls under a band that stays put, edge to edge, like a dock panel.
+        // Sized from the tiles on screen it would follow them sideways and slide off once the dock apps scrolled away.
+        boolean fixed = singleRow && (parent.canScrollHorizontally(1) || parent.canScrollHorizontally(-1));
         boolean any = false;
         int cardWidth = 0;
         for (int i = 0; i < parent.getChildCount(); i++) {
             View child = parent.getChildAt(i);
             int pos = parent.getChildAdapterPosition(child);
-            if (pos < 0 || (!bandAll && pos >= dockSize)) continue;
+            if (pos < 0 || (!bandAll && !fixed && pos >= dockSize)) continue;
             RecyclerView.ViewHolder vh = parent.getChildViewHolder(child);
             View card = vh instanceof AppAdapter.Holder ? ((AppAdapter.Holder) vh).card : child.findViewById(R.id.card);
             if (card == null) continue;
@@ -132,7 +135,10 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
             rect.inset(singleRow ? -sidePad : -side, -pad);
             radius = 26 * density;
         }
-        if (singleRow) {
+        if (fixed) {
+            rect.left = density;
+            rect.right = parent.getWidth() - density;
+        } else if (singleRow) {
             // Tiles past the screen's edge: the band stops at the grid's edge with its rounded end instead of being
             // sliced square there.
             rect.left = Math.max(rect.left, density);

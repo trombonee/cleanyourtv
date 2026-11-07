@@ -157,6 +157,7 @@
             android:text="@string/home_settings" />
 
         <TextView
+            android:id="@+id/defaultHomeHelp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="7dp"
@@ -169,5 +170,22 @@
             style="@style/SettingsRow"
             android:layout_marginTop="18dp"
             android:text="@string/tv_settings" />
+
+        <TextView
+            android:id="@+id/amazonHomeChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="18dp"
+            android:text="@string/amazon_home"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/amazonHomeHelp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="@string/amazon_home_help"
+            android:textColor="#FFACB8C1"
+            android:textSize="14sp"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

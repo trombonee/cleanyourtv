@@ -170,6 +170,22 @@ public final class LauncherSettingsActivity extends Activity {
         });
         findViewById(R.id.defaultHomeChoice).setOnClickListener(v ->
                 open(new Intent(this, HomeSettingsActivity.class)));
+        // Fire OS: there is no default-home picker, so offer Amazon's own home screen instead (FireHome).
+        if (FireHome.AMAZON.equals(config.stockHomeRedirect) && FireHome.amazonHomeInstalled(this)) {
+            findViewById(R.id.defaultHomeChoice).setVisibility(View.GONE);
+            findViewById(R.id.defaultHomeHelp).setVisibility(View.GONE);
+            View amazonHome = findViewById(R.id.amazonHomeChoice);
+            amazonHome.setVisibility(View.VISIBLE);
+            findViewById(R.id.amazonHomeHelp).setVisibility(View.VISIBLE);
+            amazonHome.setOnClickListener(v -> {
+                try {
+                    FireHome.openAmazonHome(this);
+                    finish();
+                } catch (ActivityNotFoundException | SecurityException e) {
+                    Toast.makeText(this, R.string.not_available, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
         findViewById(R.id.tvSettingsChoice).setOnClickListener(v ->
                 open(SystemSettings.intent(this, Settings.ACTION_SETTINGS)));
         refresh();

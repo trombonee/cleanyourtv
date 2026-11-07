@@ -455,6 +455,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FireHome.launcherCreated();
         setContentView(R.layout.activity_main);
         density = getResources().getDisplayMetrics().density;
         // config.xml, overlaid by config.json from a pushed theme (see Config and tools/theme.sh).
@@ -1053,6 +1054,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (openLibraryIfAsked(intent)) return;
         if (openInputsIfAsked(intent)) return;
         if (intent == null || !intent.hasCategory(Intent.CATEGORY_HOME)) return;
+        backToFirstTile();
+    }
+
+    /** Fire OS: presses made while FireHome's cover stood in for this screen, delivered as if they had come now. */
+    private void replayKeys(int[] keys) {
+        if (keys.length == 0) return;
+        android.util.Log.i("FireHome", "replaying " + keys.length + " keys");
+        // Injected as input into this app's own focused window (no permission needed for that), so the D-pad moves
+        // focus the way a real press does: calling dispatchKeyEvent directly skips ViewRootImpl's focus navigation.
+        // sendKeyDownUpSync waits for each key to be handled, so it runs off the main thread.
+        new Thread(() -> {
+            android.app.Instrumentation input = new android.app.Instrumentation();
+            for (int code : keys) {
+                try {
+                    input.sendKeyDownUpSync(code);
+                } catch (RuntimeException lostFocus) {
+                    return;   // the window lost focus meanwhile (another app or a dialog): drop the rest
+                }
+            }
+        }, "FireHomeReplay").start();
+    }
+
+    /** Home pressed: back to the first tile. */
+    private void backToFirstTile() {
         if (gameDay != null && !stopped) gameDay.read();
         grid.scrollToPosition(0);
         lastFocused = 0;
@@ -1299,6 +1324,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     @Override
     protected void onPause() {
+        // Fire OS: keep this frame for the cover over Amazon's home, before popups and animations are torn down.
+        if (FireHome.isActive()) FireHome.launcherHidden(getWindow());
         super.onPause();
         resumed = false;
         // No UP reaches a paused Home, so a vendor-key hold it saw go down would still open its app later.
@@ -1363,6 +1390,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
+            FireHome.launcherShown();
+            replayKeys(FireHome.takeQueuedKeys());
             startPendingSettingsReorder();
             if (libraryFocusPending && appLibrary == null) focusLibrary();
             showCardPrompt();
@@ -1374,6 +1403,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        FireHome.launcherDestroyed();
         RemoteKeys.release(this);
         cancelHoldOk();
         if (gameDay != null) gameDay.shutdown();
